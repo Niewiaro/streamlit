@@ -27,4 +27,7 @@ pg = st.navigation(
     }
 )
 
+st.logo("assets/niewiaro.png")
+st.sidebar.text("Made with ❤ by Niewiaro")
+
 pg.run()
