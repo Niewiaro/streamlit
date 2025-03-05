@@ -37,12 +37,17 @@ st.subheader(
 )
 st.markdown(
     """
-    - Tworzenie listy najbardziej dopasowanych kandydatów na podstawie określonych parametrów.
-    - Webowa platforma dostępna wewnątrz firmy.
-    - Intuicyjny i łatwy w obsłudze interfejs użytkownika.
-    - Zakładany czas realizacji: 4 man weeks.
-    - Usprawnienie procesu wyszukiwania odpowiedniego kandydata do danego zadania.
-    - Lepsza i bardziej przejrzysta ścieżka rozwoju dla pracowników.
+    1. Opracowanie algorytmu do tworzenia listy najbardziej dopasowanych kandydatów na podstawie określonych parametrów, takich jak kompetencje, doświadczenie i preferencje zawodowe - do końca 2. tygodnia projektu.
+    2. Stworzenie i wdrożenie webowej platformy, dostępnej wewnątrz firmy, umożliwiającej szybkie i efektywne wyszukiwanie kandydatów - do końca 14. tygodnia projektu.
+    3. Zaprojektowanie oraz przetestowanie intuicyjnego i łatwego w obsłudze interfejsu użytkownika, który pozwoli menedżerom na efektywne korzystanie z platformy - do końca 5. tygodnia projektu.
+    4. Zrealizowanie projektu w założonym czasie - 14 tygodnie robocze, z podziałem na etapy:
+    - Tydzień 1: Analiza wymagań, projektowanie architektury systemu.
+    - Tydzień 2: Tworzenie algorytmu dopasowywania i pierwszej wersji interfejsu.
+    - Tydzień 3: Implementacja i testy platformy.
+    - Tydzień 4: Optymalizacja, poprawki.
+    - Tydzień 7: Połączenie się z wewnętrznymi źródłami danych.
+    5. Zmniejszenie czasu potrzebnego na wyszukiwanie odpowiedniego kandydata o min. 60% w porównaniu do obecnego procesu - mierzone w pierwszym miesiącu po wdrożeniu systemu.
+    6. Poprawa ścieżki rozwoju pracowników, poprzez identyfikację co najmniej 3 obszarów kompetencyjnych dla każdego użytkownika systemu - raportowane w pierwszym kwartale po wdrożeniu.
     """
 )
 
