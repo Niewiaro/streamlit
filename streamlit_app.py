@@ -13,17 +13,17 @@ about_page = st.Page(
     icon=":material/info:",
 )
 
-flashcards_page = st.Page(
-    page="views/flashcards.py",
-    title="Flashcards",
+project_card_page = st.Page(
+    page="views/project_card.py",
+    title="Project Card",
     icon=":material/playing_cards:",
 )
 
-# pg = st.navigation(pages=[home_page, about_page, flashcards_page])
+# pg = st.navigation(pages=[home_page, about_page, project_card_page])
 pg = st.navigation(
     {
         "Main": [home_page, about_page],
-        "Projects": [flashcards_page],
+        "Projects": [project_card_page],
     }
 )
 
