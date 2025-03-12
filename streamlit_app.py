@@ -19,11 +19,17 @@ project_card_page = st.Page(
     icon=":material/playing_cards:",
 )
 
+burn_charts_page = st.Page(
+    page="views/burn_charts.py",
+    title="Burn-charts",
+    icon=":material/local_fire_department:",
+)
+
 # pg = st.navigation(pages=[home_page, about_page, project_card_page])
 pg = st.navigation(
     {
         "Main": [home_page, about_page],
-        "Projects": [project_card_page],
+        "Projects": [project_card_page, burn_charts_page],
     }
 )
 
