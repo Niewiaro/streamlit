@@ -10,44 +10,99 @@ st.title("Wykresy spalania")
 st.header("Burn-down & Burn-up", divider=True)
 st.subheader("Setup", divider=True)
 
+WEEKS_RANGE = (1, 16)
 WEEKS = 6
+
+SCOPE_RANGE = (1, 130)
 SCOPE = 60
+
+COMPLETED = [10, 7, 8, 11, 15, 6]
+COMPLETED_RANDOM = (-3, 3)
+COMPLETED_RANDOM_RANGE = (-10, 10)
+
+ADDITIONAL = [1, 2, 0, 1, 1, 0]
+ADDITIONAL_RANDOM = (0, 2)
+ADDITIONAL_RANDOM_RANGE = (0, 10)
 ADDITIONAL_SUM = 5
 ADDITIONAL_RANGE = (0, 2)
 
-weeks = st.slider("Ilość tygodni", 1, 16, WEEKS)
-scope = st.slider("Ilość zadań", 1, 200, SCOPE)
+
+# Weeks
+weeks = st.slider("Ilość tygodni", *WEEKS_RANGE, WEEKS)
+# Scope
+scope = st.slider("Ilość zadań", *SCOPE_RANGE, SCOPE)
+
 
 collect_numbers = lambda x: [int(i) for i in re.split("[^0-9]", x) if i != ""]
 
-completed = (
-    [10, 7, 8, 11, 15, 6]
-    if weeks == WEEKS and scope == SCOPE
-    else [
-        random.randint(int(scope / weeks * 0.8), int(scope / weeks * 1.2))
-        for _ in range(weeks)
-    ]
-)
+completed_list = [
+    COMPLETED[week] if week < len(COMPLETED) else 0 for week in range(weeks)
+]
+additional_list = [
+    ADDITIONAL[week] if week < len(ADDITIONAL) else 0 for week in range(weeks)
+]
+
+# Completed
 completed_input = st.text_input(
-    f"Zadania wykonane w każdym z {weeks} tygodni", completed
+    f"Zadania wykonane w każdym z {weeks} tygodni", completed_list
 )
 completed_list = collect_numbers(completed_input)
-st.write(completed_list)
 
-additional_range = st.slider(
-    "Ilość dodatkowych zadań  w każdym z {weeks} tygodni", 0, 10, (0, 2)
-)
-additional = (
-    [1, 2, 0, 1, 1, 0]
-    if weeks == WEEKS and scope == SCOPE and additional_range == ADDITIONAL_RANGE
-    else [random.randint(*additional_range) for _ in range(weeks)]
-)
+
+# Buttons Input or Random
+col1, col2 = st.columns(2)
+with col2:
+    completed_random = st.slider(
+        "Select a range of values", *COMPLETED_RANDOM_RANGE, COMPLETED_RANDOM
+    )
+
+left, right = st.columns(2)
+if left.button(
+    "Input Completed",
+    type="primary",
+    icon=":material/bookmark:",
+    use_container_width=True,
+):
+    left.write(completed_list)
+
+if right.button("Random", icon=":material/ifl:", use_container_width=True):
+    completed_list = [
+        random.randint(
+            int(scope / weeks + completed_random[0]),
+            int(scope / weeks + completed_random[1]),
+        )
+        for _ in range(weeks)
+    ]
+    right.write(completed_list)
+
+
+# Additional
 additional_input = st.text_input(
     f"Nowe zadania dodane w trakcie realizacji projektu w każdym z {weeks} tygodni",
-    additional,
+    additional_list,
 )
 additional_list = collect_numbers(additional_input)
-st.write(additional_list)
+
+# Buttons Input or Random
+col1, col2 = st.columns(2)
+with col2:
+    additional_random = st.slider(
+        "Select a range of values", *ADDITIONAL_RANDOM_RANGE, ADDITIONAL_RANDOM
+    )
+
+left, right = st.columns(2)
+if left.button(
+    "Input Additional",
+    type="primary",
+    icon=":material/bookmark:",
+    use_container_width=True,
+):
+    left.write(additional_list)
+
+if right.button("Random", icon=":material/casino:", use_container_width=True):
+    additional_list = [random.randint(*additional_random) for _ in range(weeks)]
+    right.write(additional_list)
+
 ADDITIONAL_SUM = sum(additional_list)
 
 
@@ -69,15 +124,6 @@ st.markdown(
 
 df = pd.DataFrame(
     {
-        # "Tydzień": [
-        #     f"Tydzień {week}" if week != 0 else "Start" for week in range(weeks + 1)
-        # ],
-        # "Zaplanowane zadania": [
-        #     scope / weeks if week != weeks else 0 for week in range(weeks + 1)
-        # ],
-        # "Zadania wykonane": [
-        #     completed_list[week - 1] if week != 0 else 0 for week in range(weeks + 1)
-        # ],
         "Tydzień": [
             f"Tydzień {week}" if week != 0 else "Start" for week in range(weeks + 1)
         ],
