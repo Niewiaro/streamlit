@@ -212,3 +212,33 @@ st.caption(
 # st.caption(
 #     "Wykres Burn-down, czyli przebieg zaplanowany (uwzględniając zmianę scope) do faktycznego stanu w każdym z tygodni."
 # )
+
+# Zadanie 2
+st.header("Zadanie 2", divider=True)
+st.subheader("Przygotowanie wykresu burn-up.", divider=True)
+
+st.markdown(
+    """
+    Wykres burn-up pokazuje, jak zespół osiąga postęp w projekcie, uwzględniając również wprowadzenie nowych zadań. 
+
+    1. Stworzenie wykresu burn-up dla projektu. Oś X to czas (tygodnie), a oś Y to całkowita liczba zrealizowanych zadań (łącznie z nowymi zadaniami).
+    2. Na wykresie należy uwzględnić łączną liczbę ukończonych zadań dla każdego tygodnia (faktyczna realizacja) oraz łączną liczbę zadań wprowadzonych do projektu (łączna praca).
+    """
+)
+
+chart_data_burn_up = pd.DataFrame(df["Wykonane"])
+chart_data_burn_up["Wykonane"] = chart_data_burn_up["Wykonane"].cumsum()
+chart_data_burn_up["Łączna praca"] = scope + df["Nowe"].cumsum()
+
+st.caption("Tabela danych do wykresu.")
+st.table(chart_data_burn_up[["Łączna praca", "Wykonane"]])
+
+st.line_chart(
+    chart_data_burn_up,
+    x_label="Czas [tygodnie]",
+    y_label="Nakład pracy [ilość zadań]",
+    color=["#FF0000", "#0000FF"],
+)
+st.caption(
+    "Wykres Burn-up, czyli przebieg wykonanych zadań do całkowitego nakładu pracy."
+)
