@@ -78,11 +78,19 @@ df = pd.DataFrame(
         # "Zadania wykonane": [
         #     completed_list[week - 1] if week != 0 else 0 for week in range(weeks + 1)
         # ],
-        "Tydzień": [f"Tydzień {week+1}" for week in range(weeks)],
-        "Zaplanowane": [scope / weeks for _ in range(weeks)],
-        "Wykonane": [int(completed_list[week]) for week in range(weeks)],
+        "Tydzień": [
+            f"Tydzień {week}" if week != 0 else "Start" for week in range(weeks + 1)
+        ],
+        "Zaplanowane": [scope / weeks if week != 0 else 0 for week in range(weeks + 1)],
+        "Wykonane": [
+            int(completed_list[week - 1]) if week != 0 else 0
+            for week in range(weeks + 1)
+        ],
         "Pozostałe": "",
-        "Nowe": [int(additional_list[week]) for week in range(weeks)],
+        "Nowe": [
+            int(additional_list[week - 1]) if week != 0 else 0
+            for week in range(weeks + 1)
+        ],
         "Pozostałe po sprincie": "",
     }
 )
@@ -98,5 +106,63 @@ for i in range(1, len(df)):
         - df.loc[i, "Wykonane"]
         + df.loc[i, "Nowe"]
     )
-
 st.table(df)
+# st.dataframe(df)
+
+# Zadanie 1
+st.header("Zadanie 1", divider=True)
+st.subheader("Przygotowanie wykresu burn-down.", divider=True)
+
+st.markdown(
+    """
+    Wykres burn-down pokazuje, ile zadań pozostało do wykonania w projekcie na koniec każdego tygodnia.
+
+    1. Wyznaczenie linii reprezentującej zaplanowaną liczbę zadań (tzn. ile zadań powinno być ukończone na koniec każdego tygodnia w idealnym scenariuszu realizacji projektu).
+    2. Przygotowanie wykresu burn-down dla projektu na podstawie danych (faktyczna realizacja). Oś X to czas (tygodnie), a oś Y to liczba pozostałych zadań.
+    """
+)
+
+# Tworzymy nowy DataFrame na potrzeby wykresu
+chart_data_burn_down = pd.DataFrame(df["Pozostałe"])  # Konwersja na DataFrame
+
+# Obliczamy idealne tempo wykonania na podstawie "Zaplanowane"
+chart_data_burn_down["Idealne"] = scope - df["Zaplanowane"].cumsum()
+
+st.caption("Tabela danych do wykresu.")
+st.table(chart_data_burn_down[["Idealne", "Pozostałe"]])
+
+st.line_chart(
+    chart_data_burn_down,
+    x_label="Czas [tygodnie]",
+    y_label="Pozostały nakład pracy [ilość zadań]",
+    color=["#0000FF", "#FF0000"],
+)
+st.caption(
+    "Wykres Burn-down, czyli przebieg zaplanowany pierwotnie (idealnie) do faktycznego stanu w każdym z tygodni."
+)
+
+# # Realny burndown
+# st.subheader(
+#     "Jednak w praktyce ilość zadań zmienia się w trakcie sprintów.", divider=True
+# )
+
+# chart_data_burn_down_real = pd.DataFrame(df["Pozostałe po sprincie"])
+# chart_data_burn_down_real["Realne"] = (
+#     scope - df["Zaplanowane"].cumsum() + df["Nowe"].cumsum()
+# )
+
+# ordered_columns = ["Realne", "Pozostałe po sprincie"]  # Ustalona kolejność
+# chart_data_burn_down_real = chart_data_burn_down_real[ordered_columns]
+
+# st.caption("Tabela danych do wykresu.")
+# st.table(chart_data_burn_down_real)
+
+# st.line_chart(
+#     chart_data_burn_down_real,
+#     x_label="Czas [tygodnie]",
+#     y_label="Pozostały nakład pracy [ilość zadań]",
+#     color=["#FF0000", "#0000FF"],
+# )
+# st.caption(
+#     "Wykres Burn-down, czyli przebieg zaplanowany (uwzględniając zmianę scope) do faktycznego stanu w każdym z tygodni."
+# )
