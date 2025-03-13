@@ -242,3 +242,54 @@ st.line_chart(
 st.caption(
     "Wykres Burn-up, czyli przebieg wykonanych zadań do całkowitego nakładu pracy."
 )
+
+# Zadanie 3
+st.header("Zadanie 3", divider=True)
+st.subheader("Analiza i porównanie wykresów.", divider=True)
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.line_chart(
+        chart_data_burn_down,
+        x_label="Czas [tygodnie]",
+        y_label="Pozostały nakład pracy [ilość zadań]",
+        color=["#0000FF", "#FF0000"],
+    )
+    st.caption("Wykres Burn-down.")
+
+with col2:
+    st.line_chart(
+        chart_data_burn_up,
+        x_label="Czas [tygodnie]",
+        y_label="Nakład pracy [ilość zadań]",
+        color=["#FF0000", "#0000FF"],
+    )
+    st.caption("Wykres Burn-up.")
+
+completed_output = df["Pozostałe"].iloc[-1]
+
+if completed_output > 0:
+    zadanie3_burn_down = f"""
+    Analizując wykres Burn-down można zauważyć, że praca zaplanowana nie została zrealizowana w wyznaczonym terminie.
+    Pozostało {completed_output} nieukończonych zadań.
+    """
+
+elif completed_output < 0:
+    zadanie3_burn_down = f"""
+    Analizując wykres Burn-down można zauważyć, że praca zaplanowana została zrealizowana w wyznaczonym terminie.
+    Ukończono {abs(completed_output)} więcej zadań niż zostało to zaplanowane.
+    """
+
+else:
+    zadanie3_burn_down = "Analizując wykres Burn-down można zauważyć, że praca zaplanowana została zrealizowana w wyznaczonym terminie."
+
+st.markdown(zadanie3_burn_down)
+
+if ADDITIONAL_SUM == 0:
+    zadanie3_burn_up = "Patrząc na wykres Burn-up widać, że przebieg łącznej pracy jest stały, co implikuje, że do scope zadań nie zostały dorzucone dodatkowe aktywności."
+
+else:
+    zadanie3_burn_up = f"Patrząc na wykres Burn-up widać, że przebieg łącznej pracy nie jest stały. Spowodowane to zostało dodaniem do scope {ADDITIONAL_SUM} zadań."
+
+st.markdown(zadanie3_burn_up)
