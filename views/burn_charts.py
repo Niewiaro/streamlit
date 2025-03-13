@@ -293,3 +293,81 @@ else:
     zadanie3_burn_up = f"Patrząc na wykres Burn-up widać, że przebieg łącznej pracy nie jest stały. Spowodowane to zostało dodaniem do scope {ADDITIONAL_SUM} zadań."
 
 st.markdown(zadanie3_burn_up)
+
+
+# Zadanie 4
+st.header("Zadanie 4", divider=True)
+st.subheader("Dodanie ryzyka w projekcie.", divider=True)
+st.text(
+    "Podczas realizacji projektu może dojść do zmian w zespole projektowym (dołączenie nowego członka lub rezygnacja kogoś z zespołu). Należy uwzględnić wpływ takiej zmiany na tempo realizacji zadań."
+)
+
+
+st.subheader("Nowy programista.", divider=True)
+
+new_programmer_week = 4 if weeks >= 4 else weeks
+new_programmer_week = st.slider(
+    "Tydzień, w którym programista dołącza.", WEEKS_RANGE[0], weeks, new_programmer_week
+)
+new_programmer = 30
+new_programmer = st.slider(
+    "Procent o jaki podnosi przerób zadań.", 0, 100, new_programmer
+)
+
+chart_data_burn_down["Wykonane"] = pd.DataFrame(df["Wykonane"])
+chart_data_burn_down.loc[
+    chart_data_burn_down.index >= new_programmer_week, "Wykonane"
+] *= (new_programmer / 100 + 1)
+chart_data_burn_down["Pozostałe"] = scope - chart_data_burn_down["Wykonane"].cumsum()
+
+st.text(
+    f"W {new_programmer_week} tygodniu pracy zespół zatrudnia nowego programistę, który pomaga w realizacji projektu. Podnosi on przerób zadań o {new_programmer}%."
+)
+st.caption(
+    f"Tabela danych po zatrudnieniu programisty w {new_programmer_week} tygodniu."
+)
+st.table(chart_data_burn_down[["Idealne", "Wykonane", "Pozostałe"]])
+st.line_chart(
+    chart_data_burn_down[["Idealne", "Pozostałe"]],
+    x_label="Czas [tygodnie]",
+    y_label="Pozostały nakład pracy [ilość zadań]",
+    color=["#0000FF", "#FF0000"],
+)
+st.caption("Wykres Burn-down.")
+
+
+st.subheader("Utrata testera.", divider=True)
+
+lose_tester_week = 5 if weeks >= 5 else weeks
+lose_tester_week = st.slider(
+    "Tydzień, w którym odchodzi tester.", WEEKS_RANGE[0], weeks, lose_tester_week
+)
+lose_tester = 80
+lose_tester = st.slider("Procent o jaki spada przerób zadań.", 0, 100, lose_tester)
+
+chart_data_burn_down.loc[
+    chart_data_burn_down.index >= lose_tester_week, "Wykonane"
+] *= 1 - (lose_tester / 100)
+chart_data_burn_down["Pozostałe"] = scope - chart_data_burn_down["Wykonane"].cumsum()
+
+st.text(
+    f"W {lose_tester_week} tygodniu pracy zespół traci testera. Strata ta obniża przerób zadań o {lose_tester}%."
+)
+st.caption(f"Tabela danych po odejściu testera w {lose_tester_week} tygodniu.")
+st.table(chart_data_burn_down[["Idealne", "Wykonane", "Pozostałe"]])
+st.line_chart(
+    chart_data_burn_down[["Idealne", "Pozostałe"]],
+    x_label="Czas [tygodnie]",
+    y_label="Pozostały nakład pracy [ilość zadań]",
+    color=["#0000FF", "#FF0000"],
+)
+st.caption("Wykres Burn-down.")
+
+zadanie4_output = chart_data_burn_down["Pozostałe"].iloc[-1]
+if zadanie4_output > 0:
+    zadanie4 = f"Mimo zatrudnienia programisty, utrata testera znacząco wpłynęła na realizację zadań i nie udało się dotrzymać terminu. Do sukcesu zabrakło realizacji {zadanie4_output:.2f} zadań."
+
+else:
+    zadanie4 = f"Mimo utraty testera, dzięki zatrudnieniu dodatkowego programisty spowodowało, że udało się dotrzymać terminu. Względem zaplanowanego scope zrealizowano dodatkowo {abs(zadanie4_output):.2f} zadań."
+
+st.markdown(zadanie4)
