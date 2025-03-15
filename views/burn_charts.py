@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import re
 import random
+import math
 
 
 st.title("Wykresy spalania")
@@ -152,6 +153,8 @@ for i in range(1, len(df)):
         - df.loc[i, "Wykonane"]
         + df.loc[i, "Nowe"]
     )
+df["Wydajność"] = df["Wykonane"] / df["Zaplanowane"]
+
 st.table(df)
 # st.dataframe(df)
 
@@ -352,6 +355,8 @@ lose_tester = st.slider("Procent o jaki spada przerób zadań.", 0, 100, lose_te
 
 df.loc[df.index >= lose_tester_week, "Wykonane"] *= 1 - (lose_tester / 100)
 df["Pozostałe"] = scope - df["Wykonane"].cumsum()
+df["Wykonane łącznie"] = df["Wykonane"].cumsum()
+
 
 st.text(
     f"W {lose_tester_week} tygodniu pracy zespół traci testera. Strata ta obniża przerób zadań o {lose_tester}%."
@@ -402,7 +407,6 @@ for i in range(1, len(df)):
 st.caption("Tabela danych do wykresu.")
 st.table(df[["Praca łącznie", "Wykonane łącznie"]])
 
-st.table(df)
 st.line_chart(
     df[["Praca łącznie", "Wykonane łącznie"]],
     x_label="Czas [tygodnie]",
@@ -420,3 +424,53 @@ else:
     zadanie5 = f"Dzięki usunięciu ze scope {deleted_tasks} zadań w {deleted_tasks_week} tygodniu udało się dotrzymać terminu. Zrealizowano {scope} zaplanowanych oraz dodatkowo {abs(zadanie5_output):.2f} zadań."
 
 st.markdown(zadanie5)
+
+
+# Zadanie 6
+st.header("Zadanie 6", divider=True)
+st.subheader("Ocena wydajności zespołu.", divider=True)
+st.text(
+    "Na podstawie danych o ukończonych zadaniach, obliczyć średnią wydajność zespołu w każdym z tygodni."
+)
+st.latex(
+    r"\text{Wydajność w danym tygodniu} = \frac{\text{Ukończone zadania}}{\text{Zaplanowane zadania}}"
+)
+
+
+df["Wydajność końcowa"] = df["Wykonane"] / df["Zaplanowane"]
+# df["Wydajność końcowa"] = df["Wydajność końcowa"].apply(
+#     lambda x: f"{x:.2%}" if pd.notna(x) else ""
+# )
+
+st.table(
+    df[["Tydzień", "Wydajność", "Wydajność końcowa"]]
+    .iloc[1:]
+    .style.format({"Wydajność": "{:.2%}", "Wydajność końcowa": "{:.2%}"})
+)
+
+# st.dataframe(df[["Tydzień", "Wydajność", "Wydajność końcowa"]])
+
+wydajnosc_mean = df["Wydajność"].mean()
+wydajnosc_koncowa_mean = df["Wydajność końcowa"].mean()
+
+finish = math.ceil(weeks / wydajnosc_mean)
+finish_koncowa = math.ceil(weeks / wydajnosc_koncowa_mean)
+
+st.subheader("Wydajność początkowa.", divider=True)
+
+if finish <= weeks:
+    zadanie6 = f"Przy wydajności średniej początkowej {wydajnosc_mean:.2%} plan zostanie zrealizowany w {finish} tygodni."
+else:
+    zadanie6 = f"Przez wydajność średnią początkową {wydajnosc_mean:.2%} plan nie zostanie zrealizowany w {weeks} tygodni. Można oszacować, że zespół zakończy pracę w łącznie {finish} tygodni."
+
+st.markdown(zadanie6)
+
+
+st.subheader("Wydajność końcowa.", divider=True)
+
+if finish_koncowa <= weeks:
+    zadanie6_koncowa = f"Przy wydajności średniej końcowej {wydajnosc_koncowa_mean:.2%} plan zostanie zrealizowany w {finish_koncowa} tygodni."
+else:
+    zadanie6_koncowa = f"Przez wydajność średnią końcową {wydajnosc_koncowa_mean:.2%} plan nie zostanie zrealizowany w {weeks} tygodni. Można oszacować, że zespół zakończy pracę w łącznie {finish_koncowa} tygodni."
+
+st.markdown(zadanie6_koncowa)
