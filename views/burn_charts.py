@@ -169,16 +169,19 @@ st.markdown(
 )
 
 # Tworzymy nowy DataFrame na potrzeby wykresu
-chart_data_burn_down = pd.DataFrame(df["Pozostałe"])  # Konwersja na DataFrame
+# chart_data_burn_down = pd.DataFrame(df["Pozostałe"])  # Konwersja na DataFrame
 
 # Obliczamy idealne tempo wykonania na podstawie "Zaplanowane"
-chart_data_burn_down["Idealne"] = scope - df["Zaplanowane"].cumsum()
+# chart_data_burn_down["Idealne"] = scope - df["Zaplanowane"].cumsum()
+df["Idealne"] = scope - df["Zaplanowane"].cumsum()
 
 st.caption("Tabela danych do wykresu.")
-st.table(chart_data_burn_down[["Idealne", "Pozostałe"]])
+# st.table(chart_data_burn_down[["Idealne", "Pozostałe"]])
+st.table(df[["Idealne", "Pozostałe"]])
 
 st.line_chart(
-    chart_data_burn_down,
+    # chart_data_burn_down,
+    df[["Idealne", "Pozostałe"]],
     x_label="Czas [tygodnie]",
     y_label="Pozostały nakład pracy [ilość zadań]",
     color=["#0000FF", "#FF0000"],
@@ -226,18 +229,22 @@ st.markdown(
     """
 )
 
-chart_data_burn_up = pd.DataFrame(df["Wykonane"])
-chart_data_burn_up["Wykonane"] = chart_data_burn_up["Wykonane"].cumsum()
-chart_data_burn_up["Łączna praca"] = scope + df["Nowe"].cumsum()
+# chart_data_burn_up = pd.DataFrame(df["Wykonane"])
+# chart_data_burn_up["Wykonane"] = chart_data_burn_up["Wykonane"].cumsum()
+df["Wykonane łącznie"] = df["Wykonane"].cumsum()
+# chart_data_burn_up["Łączna praca"] = scope + df["Nowe"].cumsum()
+df["Praca łącznie"] = scope + df["Nowe"].cumsum()
 
 st.caption("Tabela danych do wykresu.")
-st.table(chart_data_burn_up[["Łączna praca", "Wykonane"]])
+# st.table(chart_data_burn_up[["Łączna praca", "Wykonane"]])
+st.table(df[["Praca łącznie", "Wykonane łącznie"]])
 
 st.line_chart(
-    chart_data_burn_up,
+    # chart_data_burn_up,
+    df[["Praca łącznie", "Wykonane łącznie"]],
     x_label="Czas [tygodnie]",
     y_label="Nakład pracy [ilość zadań]",
-    color=["#FF0000", "#0000FF"],
+    color=["#0000FF", "#FF0000"],
 )
 st.caption(
     "Wykres Burn-up, czyli przebieg wykonanych zadań do całkowitego nakładu pracy."
@@ -251,7 +258,7 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.line_chart(
-        chart_data_burn_down,
+        df[["Idealne", "Pozostałe"]],
         x_label="Czas [tygodnie]",
         y_label="Pozostały nakład pracy [ilość zadań]",
         color=["#0000FF", "#FF0000"],
@@ -260,7 +267,7 @@ with col1:
 
 with col2:
     st.line_chart(
-        chart_data_burn_up,
+        df[["Praca łącznie", "Wykonane łącznie"]],
         x_label="Czas [tygodnie]",
         y_label="Nakład pracy [ilość zadań]",
         color=["#FF0000", "#0000FF"],
@@ -314,11 +321,9 @@ new_programmer = st.slider(
     "Procent o jaki podnosi przerób zadań.", 0, 100, new_programmer
 )
 
-chart_data_burn_down["Wykonane"] = pd.DataFrame(df["Wykonane"])
-chart_data_burn_down.loc[
-    chart_data_burn_down.index >= new_programmer_week, "Wykonane"
-] *= (new_programmer / 100 + 1)
-chart_data_burn_down["Pozostałe"] = scope - chart_data_burn_down["Wykonane"].cumsum()
+# chart_data_burn_down["Wykonane"] = pd.DataFrame(df["Wykonane"]).astype(float)
+df.loc[df.index >= new_programmer_week, "Wykonane"] *= new_programmer / 100 + 1
+df["Pozostałe"] = scope - df["Wykonane"].cumsum()
 
 st.text(
     f"W {new_programmer_week} tygodniu pracy zespół zatrudnia nowego programistę, który pomaga w realizacji projektu. Podnosi on przerób zadań o {new_programmer}%."
@@ -326,9 +331,9 @@ st.text(
 st.caption(
     f"Tabela danych po zatrudnieniu programisty w {new_programmer_week} tygodniu."
 )
-st.table(chart_data_burn_down[["Idealne", "Wykonane", "Pozostałe"]])
+st.table(df[["Idealne", "Wykonane", "Pozostałe"]])
 st.line_chart(
-    chart_data_burn_down[["Idealne", "Pozostałe"]],
+    df[["Idealne", "Pozostałe"]],
     x_label="Czas [tygodnie]",
     y_label="Pozostały nakład pracy [ilość zadań]",
     color=["#0000FF", "#FF0000"],
@@ -345,25 +350,23 @@ lose_tester_week = st.slider(
 lose_tester = 80
 lose_tester = st.slider("Procent o jaki spada przerób zadań.", 0, 100, lose_tester)
 
-chart_data_burn_down.loc[
-    chart_data_burn_down.index >= lose_tester_week, "Wykonane"
-] *= 1 - (lose_tester / 100)
-chart_data_burn_down["Pozostałe"] = scope - chart_data_burn_down["Wykonane"].cumsum()
+df.loc[df.index >= lose_tester_week, "Wykonane"] *= 1 - (lose_tester / 100)
+df["Pozostałe"] = scope - df["Wykonane"].cumsum()
 
 st.text(
     f"W {lose_tester_week} tygodniu pracy zespół traci testera. Strata ta obniża przerób zadań o {lose_tester}%."
 )
 st.caption(f"Tabela danych po odejściu testera w {lose_tester_week} tygodniu.")
-st.table(chart_data_burn_down[["Idealne", "Wykonane", "Pozostałe"]])
+st.table(df[["Idealne", "Wykonane", "Pozostałe"]])
 st.line_chart(
-    chart_data_burn_down[["Idealne", "Pozostałe"]],
+    df[["Idealne", "Pozostałe"]],
     x_label="Czas [tygodnie]",
     y_label="Pozostały nakład pracy [ilość zadań]",
     color=["#0000FF", "#FF0000"],
 )
 st.caption("Wykres Burn-down.")
 
-zadanie4_output = chart_data_burn_down["Pozostałe"].iloc[-1]
+zadanie4_output = df["Pozostałe"].iloc[-1]
 if zadanie4_output > 0:
     zadanie4 = f"Mimo zatrudnienia programisty, utrata testera znacząco wpłynęła na realizację zadań i nie udało się dotrzymać terminu. Do sukcesu zabrakło realizacji {zadanie4_output:.2f} zadań."
 
@@ -371,3 +374,17 @@ else:
     zadanie4 = f"Mimo utraty testera, dzięki zatrudnieniu dodatkowego programisty spowodowało, że udało się dotrzymać terminu. Względem zaplanowanego scope zrealizowano dodatkowo {abs(zadanie4_output):.2f} zadań."
 
 st.markdown(zadanie4)
+
+# Zadanie 5
+st.header("Zadanie 5", divider=True)
+st.subheader("Usunięcie zadań.", divider=True)
+st.text(
+    "Podczas realizacji projektu może dojść do zmian w zespole projektowym (dołączenie nowego członka lub rezygnacja kogoś z zespołu). Należy uwzględnić wpływ takiej zmiany na tempo realizacji zadań."
+)
+
+deleted_tasks_week = 3 if weeks >= 3 else weeks
+deleted_tasks_week = st.slider(
+    "Tydzień, w którym usunięto zadania.", WEEKS_RANGE[0], weeks, deleted_tasks_week
+)
+deleted_tasks = 2
+deleted_tasks = st.slider("Ilość usuniętych zadań.", 0, scope, deleted_tasks)
