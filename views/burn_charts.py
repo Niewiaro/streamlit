@@ -474,3 +474,19 @@ else:
     zadanie6_koncowa = f"Przez wydajność średnią końcową {wydajnosc_koncowa_mean:.2%} plan nie zostanie zrealizowany w {weeks} tygodni. Można oszacować, że zespół zakończy pracę w łącznie {finish_koncowa} tygodni."
 
 st.markdown(zadanie6_koncowa)
+
+
+# Zadanie 7
+st.header("Zadanie 7", divider=True)
+st.subheader("Poprawa tempa.", divider=True)
+st.markdown(
+    """
+    Najważniejsze jest szybkie identyfikowanie problemów i wprowadzanie małych, ale skutecznych usprawnień. Aby poprawić tempo realizacji projektu w kolejnych tygodniach, warto skupić się na kilku kluczowych aspektach:
+
+    1. **Lepsze planowanie sprintów** - upewnić się, że zadania są dobrze zdefiniowane i realnie oszacowane.  
+    2. **Usuwanie blokad** - identyfikować przeszkody na Daily Scrum i eliminować je jak najszybciej.  
+    3. **Poprawa jakości kodu** - ograniczyć dług techniczny, wdrożyć więcej testów automatycznych.  
+    4. **Efektywniejsza współpraca** - usprawnić komunikację zespołową, unikać nadmiernych spotkań.  
+    5. **Stabilność priorytetów** - unikać częstych zmian backlogu w trakcie sprintu.  
+    """
+)
