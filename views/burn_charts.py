@@ -321,7 +321,7 @@ new_programmer = st.slider(
     "Procent o jaki podnosi przerób zadań.", 0, 100, new_programmer
 )
 
-# chart_data_burn_down["Wykonane"] = pd.DataFrame(df["Wykonane"]).astype(float)
+df["Wykonane"] = df["Wykonane"].astype(float)
 df.loc[df.index >= new_programmer_week, "Wykonane"] *= new_programmer / 100 + 1
 df["Pozostałe"] = scope - df["Wykonane"].cumsum()
 
@@ -388,3 +388,35 @@ deleted_tasks_week = st.slider(
 )
 deleted_tasks = 2
 deleted_tasks = st.slider("Ilość usuniętych zadań.", 0, scope, deleted_tasks)
+
+# df["Nowe"][deleted_tasks_week] -= deleted_tasks
+df.loc[deleted_tasks_week, "Nowe"] -= deleted_tasks
+df["Praca łącznie"] = scope + df["Nowe"].cumsum()
+for i in range(1, len(df)):
+    df.loc[i, "Pozostałe po sprincie"] = (
+        df.loc[i - 1, "Pozostałe po sprincie"]
+        - df.loc[i, "Wykonane"]
+        + df.loc[i, "Nowe"]
+    )
+
+st.caption("Tabela danych do wykresu.")
+st.table(df[["Praca łącznie", "Wykonane łącznie"]])
+
+st.table(df)
+st.line_chart(
+    df[["Praca łącznie", "Wykonane łącznie"]],
+    x_label="Czas [tygodnie]",
+    y_label="Nakład pracy [ilość zadań]",
+    color=["#0000FF", "#FF0000"],
+)
+st.caption("Wykres Burn-up.")
+
+
+zadanie5_output = df["Pozostałe po sprincie"].iloc[-1]
+if zadanie5_output > 0:
+    zadanie5 = f"Mimo usunięcia ze scope {deleted_tasks} zadań w {deleted_tasks_week} tygodniu nie udało się dotrzymać terminu. Do sukcesu zabrakło realizacji {zadanie5_output:.2f} zadań."
+
+else:
+    zadanie5 = f"Dzięki usunięciu ze scope {deleted_tasks} zadań w {deleted_tasks_week} tygodniu udało się dotrzymać terminu. Zrealizowano {scope} zaplanowanych oraz dodatkowo {abs(zadanie5_output):.2f} zadań."
+
+st.markdown(zadanie5)
